@@ -17,6 +17,7 @@ import mqtt.simulator.models.json.Protocols._
  */
 case class SimulationDefinition(
                                  id: UUID,
+                                 message: String,
                                  createAt: ZonedDateTime,
                                  startAt: Option[ZonedDateTime],
                                  updatedAt: Option[ZonedDateTime],
@@ -24,5 +25,5 @@ case class SimulationDefinition(
                                )
 
 object SimulationDefinition {
-  implicit val format: RootJsonFormat[SimulationDefinition] = jsonFormat5(SimulationDefinition.apply)
+  implicit val format: RootJsonFormat[SimulationDefinition] = jsonFormat6(SimulationDefinition.apply)
 }
