@@ -1,3 +1,5 @@
 package mqtt.simulator.api.models
 
-case class SimulationResponse()
+import java.util.UUID
+
+case class SimulationResponse(id: UUID)
