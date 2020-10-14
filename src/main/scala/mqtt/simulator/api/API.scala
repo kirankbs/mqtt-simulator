@@ -4,15 +4,16 @@ import java.time.ZonedDateTime
 import java.util.UUID
 
 import akka.Done
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
-import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.Directives.{complete, path}
-import mqtt.simulator.api.models.{SimulationDefinition, SimulationDefinitionRequest}
-import scala.collection.mutable.ListBuffer
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.server.Directives.{complete, path, _}
+import akka.http.scaladsl.server.directives.OnSuccessMagnet
+import mqtt.simulator.api.models.{SimulationDefinition, SimulationDefinitionRequest}
 import spray.json.DefaultJsonProtocol._
+
+import scala.collection.mutable.ListBuffer
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 object API {
 
@@ -41,8 +42,12 @@ object API {
       } ~ patch {
           path(JavaUUID) { id =>
             entity(as[SimulationDefinitionRequest]) { sdfr =>
-              onSuccess(patchSimulationDefinition(id, sdfr)) { _ => complete(StatusCodes.Created)}
+              onSuccess(patchSimulationDefinition(id, sdfr)) { _ => complete(StatusCodes.NoContent)}
             }
+          }
+        } ~ delete {
+          path(JavaUUID) { id =>
+            onSuccess(deleteSimulationDefinition(id)) { _ => complete(StatusCodes.NoContent)}
           }
         }
     }
@@ -86,6 +91,11 @@ object API {
     Future {
       Done
     }
+  }
+
+  def deleteSimulationDefinition(id: UUID): Future[Done] = {
+    simulations = simulations.filterNot(_.id == id)
+    Future { Done }
   }
 
 }
