@@ -5,6 +5,7 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
 import com.typesafe.config.ConfigFactory
 import mqtt.simulator.api.API
+import mqtt.simulator.storage.FlywayMigration
 import slick.jdbc.JdbcBackend.Database
 
 import scala.io.StdIn
