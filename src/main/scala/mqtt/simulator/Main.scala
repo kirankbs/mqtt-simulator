@@ -5,7 +5,7 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
 import com.typesafe.config.ConfigFactory
 import mqtt.simulator.api.API
-import mqtt.simulator.storage.FlywayMigration
+import mqtt.simulator.storage.{FlywayMigration, SimulationDefinitionRepo}
 import slick.jdbc.JdbcBackend.Database
 
 import scala.io.StdIn
@@ -24,7 +24,7 @@ object Main extends App {
 
 
   // HTTP API to interact with Simulation
-  val bindAndFuture = Http().newServerAt("localhost", 8080).bind(API.route)
+  val bindAndFuture = Http().newServerAt("localhost", 8080).bind(new API(new SimulationDefinitionRepo(db)).route)
   println(s"Server online at http://localhost:8080/ ...")
   StdIn.readLine()  //TODO Replace it
   bindAndFuture
