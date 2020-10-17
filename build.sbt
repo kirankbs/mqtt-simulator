@@ -1,6 +1,7 @@
+import com.typesafe.sbt.packager.docker.Cmd
+
 name := "mqtt-simulator"
 scalaVersion := "2.13.2"
-
 
 //AKkA Stack
 val AkkaVersion = "2.6.8"
@@ -21,4 +22,11 @@ libraryDependencies ++= Seq(
 
 scalafmtOnCompile := true
 
-
+enablePlugins(JavaAppPackaging)
+Docker / packageName := (ThisProject / name).value
+Docker / version := (ThisProject / version).value
+dockerBaseImage := "anapsix/alpine-java"
+dockerExposedPorts ++= Seq(8080)
+dockerEntrypoint := Seq("/opt/docker/bin/lunch-o", "-o", "--", s"/opt/docker/bin/${(ThisProject / name).value}")
+dockerCmd := Seq("-Dpidfile.path=/dev/null")
+dockerCommands += Cmd("ENV", s"SERVICE=${(Docker / name).value}")
