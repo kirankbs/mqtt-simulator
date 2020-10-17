@@ -4,9 +4,9 @@ import java.time.ZonedDateTime
 import java.util.UUID
 import mqtt.simulator.api.models.SimulationDefinition
 import slick.lifted.Tag
-import slick.jdbc.PostgresProfile.api._
+import CustomPostgresProfile.api._
 
-class SimulationDefinitionTable(tag: Tag) extends Table[SimulationDefinition](tag, "simulation_definitions") {
+class SimulationDefinitionTable(tag: Tag) extends Table[SimulationDefinition](tag,"simulation_definitions") {
 
   def id = column[UUID]("id", O.PrimaryKey)
   def message = column[String]("message")
