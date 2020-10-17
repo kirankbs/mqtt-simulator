@@ -15,10 +15,10 @@ class API(simulationDefRepo: SimulationDefinitionRepo) {
 
   val route = {
     pathPrefix("simulation") {
-        get {
-          pathEnd {
-            complete(getSimulationDefinitions())
-          }
+      get {
+        pathEnd {
+          complete(getSimulationDefinitions())
+        }
       } ~ get {
         path(JavaUUID) { id =>
           onSuccess(fetchSimulation(id)) {
@@ -27,23 +27,29 @@ class API(simulationDefRepo: SimulationDefinitionRepo) {
           }
         }
       } ~ post {
-          pathEnd {
-            entity(as[SimulationDefinitionRequest]) { definitionReq =>
-              //TODO 201 and some response
-              onSuccess(createSimulationDefinition(definitionReq)) { _ => complete(StatusCodes.Created) }
+        pathEnd {
+          entity(as[SimulationDefinitionRequest]) { definitionReq =>
+            //TODO 201 and some response
+            onSuccess(createSimulationDefinition(definitionReq)) { _ =>
+              complete(StatusCodes.Created)
             }
-          }
-      } ~ patch {
-          path(JavaUUID) { id =>
-            entity(as[SimulationDefinitionRequest]) { sdfr =>
-              onSuccess(patchSimulationDefinition(id, sdfr)) { _ => complete(StatusCodes.NoContent)}
-            }
-          }
-        } ~ delete {
-          path(JavaUUID) { id =>
-            onSuccess(deleteSimulationDefinition(id)) { _ => complete(StatusCodes.NoContent)}
           }
         }
+      } ~ patch {
+        path(JavaUUID) { id =>
+          entity(as[SimulationDefinitionRequest]) { sdfr =>
+            onSuccess(patchSimulationDefinition(id, sdfr)) { _ =>
+              complete(StatusCodes.NoContent)
+            }
+          }
+        }
+      } ~ delete {
+        path(JavaUUID) { id =>
+          onSuccess(deleteSimulationDefinition(id)) { _ =>
+            complete(StatusCodes.NoContent)
+          }
+        }
+      }
     }
   }
 
@@ -59,7 +65,8 @@ class API(simulationDefRepo: SimulationDefinitionRepo) {
   }
   def getSimulationDefinitions() = simulationDefRepo.getSimulationDefinitions()
   def fetchSimulation(simulationId: UUID) = simulationDefRepo.getSimulationDefinition(simulationId)
-  def patchSimulationDefinition(id: UUID, sdfr: SimulationDefinitionRequest): Future[Done] = simulationDefRepo.updateSimulationDefinition(id, sdfr)
+  def patchSimulationDefinition(id: UUID, sdfr: SimulationDefinitionRequest): Future[Done] =
+    simulationDefRepo.updateSimulationDefinition(id, sdfr)
   def deleteSimulationDefinition(id: UUID): Future[Done] = simulationDefRepo.deleteSimulationDefinition(id)
 
 }
