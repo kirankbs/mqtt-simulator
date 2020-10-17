@@ -2,7 +2,6 @@ package mqtt.simulator.api
 
 import java.time.ZonedDateTime
 import java.util.UUID
-
 import akka.Done
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.StatusCodes
@@ -10,20 +9,15 @@ import akka.http.scaladsl.server.Directives.{complete, path, _}
 import mqtt.simulator.api.models.{SimulationDefinition, SimulationDefinitionRequest}
 import mqtt.simulator.storage.SimulationDefinitionRepo
 import spray.json.DefaultJsonProtocol._
-
-import scala.collection.mutable.ListBuffer
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class API(simulationDefRepo: SimulationDefinitionRepo) {
-
-  var simulations = ListBuffer.empty[SimulationDefinition]
 
   val route = {
     pathPrefix("simulation") {
         get {
           pathEnd {
-            complete(simulations.toList)
+            complete(getSimulationDefinitions())
           }
       } ~ get {
         path(JavaUUID) { id =>
@@ -63,35 +57,9 @@ class API(simulationDefRepo: SimulationDefinitionRepo) {
     )
     simulationDefRepo.createSimulationDefinition(sdf)
   }
-
-  def fetchSimulationDefinitions(): Future[List[SimulationDefinition]] =
-    Future {
-      simulations.toList
-    }
-
-  def fetchSimulation(simulationId: UUID): Future[Option[SimulationDefinition]] =
-    Future {
-      simulations.find(_.id == simulationId)
-    }
-
-  def patchSimulationDefinition(id: UUID, sdfr: SimulationDefinitionRequest): Future[Done] = {
-    val sdfNew =
-      simulations
-      .find(_.id == id)
-      .map(_.copy(message = sdfr.message, endAt = sdfr.endAt.getOrElse(ZonedDateTime.now())))
-
-    println("patch "+ sdfNew)
-
-    simulations = sdfNew.fold(simulations)(newValue => simulations.map{ sdf => if(sdf.id == id) newValue else sdf})
-
-    Future {
-      Done
-    }
-  }
-
-  def deleteSimulationDefinition(id: UUID): Future[Done] = {
-    simulations = simulations.filterNot(_.id == id)
-    Future { Done }
-  }
+  def getSimulationDefinitions() = simulationDefRepo.getSimulationDefinitions()
+  def fetchSimulation(simulationId: UUID) = simulationDefRepo.getSimulationDefinition(simulationId)
+  def patchSimulationDefinition(id: UUID, sdfr: SimulationDefinitionRequest): Future[Done] = simulationDefRepo.updateSimulationDefinition(id, sdfr)
+  def deleteSimulationDefinition(id: UUID): Future[Done] = simulationDefRepo.deleteSimulationDefinition(id)
 
 }
