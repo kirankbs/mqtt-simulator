@@ -22,11 +22,10 @@ object Main extends App {
   val db = Database.forConfig("db")
   FlywayMigration(config, "db")
 
-
   // HTTP API to interact with Simulation
   val bindAndFuture = Http().newServerAt("localhost", 8080).bind(new API(new SimulationDefinitionRepo(db)).route)
   println(s"Server online at http://localhost:8080/ ...")
-  StdIn.readLine()  //TODO Replace it
+  StdIn.readLine() //TODO Replace it
   bindAndFuture
     .flatMap(_.unbind())
     .onComplete(_ => system.terminate())

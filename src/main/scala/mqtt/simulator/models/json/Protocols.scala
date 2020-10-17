@@ -19,12 +19,13 @@ object Protocols {
 
   implicit val zonedDateTimeFormat = new RootJsonFormat[ZonedDateTime] {
     override def read(json: JsValue): ZonedDateTime = json match {
-      case JsString(value) => try {
-        ZonedDateTime.parse(value, DateTimeFormatter.ISO_ZONED_DATE_TIME).withZoneSameInstant(ZoneOffset.UTC)
-      } catch {
-        case x: Exception =>
-          deserializationError(s"Date Time Format Exception. Given value is: $value")
-      }
+      case JsString(value) =>
+        try {
+          ZonedDateTime.parse(value, DateTimeFormatter.ISO_ZONED_DATE_TIME).withZoneSameInstant(ZoneOffset.UTC)
+        } catch {
+          case x: Exception =>
+            deserializationError(s"Date Time Format Exception. Given value is: $value")
+        }
       case _ => deserializationError("Expected ISO DateTime string such as '2011-12-03T10:15:30+01:00[Europe/Paris]'")
     }
 
