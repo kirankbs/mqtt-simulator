@@ -8,7 +8,7 @@ import java.util.UUID
 import akka.Done
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import spray.json.DefaultJsonProtocol._
-import akka.http.scaladsl.model.StatusCodes.{Created, OK}
+import akka.http.scaladsl.model.StatusCodes.{Created, NoContent, OK}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import mqtt.simulator.api.models.{SimulationDefinition, SimulationDefinitionRequest}
 import mqtt.simulator.storage.SimulationDefinitionRepo
@@ -36,7 +36,6 @@ class ApiTest extends AnyWordSpec with Matchers with IdiomaticMockito with Scala
     "create simulation definition" in {
       mockRepo.createSimulationDefinition(sdf) returns Future.successful(Done)
       Post("/simulation", simulationDefReq) ~> routes ~> check {
-        println(response)
         status shouldBe Created
       }
     }
@@ -55,6 +54,21 @@ class ApiTest extends AnyWordSpec with Matchers with IdiomaticMockito with Scala
       Get("/simulation") ~> routes ~> check {
         status shouldBe OK
         responseAs[Seq[SimulationDefinition]] shouldBe result
+      }
+    }
+  }
+  "Get /simulation/<id>" should {
+    "return empty result" in {
+      mockRepo.getSimulationDefinition(uuid) returns Future.successful(None)
+      Get(s"/simulation/$uuid") ~> routes ~> check {
+        status shouldBe NoContent
+      }
+    }
+    "return non empty result" in {
+      mockRepo.getSimulationDefinition(uuid) returns Future.successful(Some(sdfExpected))
+      Get(s"/simulation/$uuid") ~> routes ~> check {
+        status shouldBe OK
+        responseAs[SimulationDefinition] shouldBe sdfExpected
       }
     }
   }
