@@ -1,0 +1,142 @@
+openapi: 3.0.0
+
+info:
+  title: IoT Simulation API
+  description: |
+    These APIs are responsible for managing the lifecycle of simulations definitions which will be executed by the simulation job.
+    Simulation job can go through the various states during it's lifecycle and hot reload with the changes of it's simulation definition.
+  version: 0.0.1
+
+servers:
+  - url: http://api.example.com/v1
+    description: Optional server description, e.g. Main (production) server
+  - url: http://staging-api.example.com
+    description: Optional server description, e.g. Internal staging server for testing
+
+paths:
+  /simulation:
+    get:
+      summary: Returns a list simulation definitions.
+      description: All the simulation definitions created are returned without pagination and compression.
+      tags:
+        - Simulation Definitions
+      responses:
+        200:
+          description: List of simulation definitions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimulationDefinitions'
+    post:
+      summary: Creates a simulation definition
+      description: The API creates a simulation definition which will be executed by a simulation job.
+      tags:
+        - Simulation Definitions
+      requestBody:
+        description: Request to create simulation definition
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimulationDefinitionRequest'
+      responses:
+        204:
+          description: Simulation definition is created successfully
+  /simulation/{id}:
+    patch:
+      summary: Updates a simulation definition
+      description: The API updates a simulation definition. The simulation job hot reloads this change.
+      tags:
+        - Simulation Definitions
+      parameters:
+        - in: path
+          name: id
+          description: UUID of the simulation definition to update
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Request to update simulation definition
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimulationDefinitionRequest'
+      responses:
+        204:
+          description: Simulation definition updated successfully
+    get:
+      summary: Retruns a simulation definition
+      description: The API returns a single simulation definition
+      tags:
+        - Simulation Definitions
+      parameters:
+        - in: path
+          name: id
+          description: UUID of the simulation definition to get
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Simulation definition is retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimulationDefinition'
+        204:
+          description: Requested resource is not available
+
+components:
+  schemas:
+    SimulationDefinitions:
+      type: array
+      items:
+        $ref: '#/components/schemas/SimulationDefinition'
+    SimulationDefinition:
+      type: object
+      required:
+        - id
+        - message
+        - createAt
+        - updateAt
+        - endAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        message:
+          type: string
+        createAt:
+          description: "Date time when simulation definition is created by user"
+          type: string
+          format: 'date-time'
+          example: ???
+        updateAt:
+          description: "Date time when simulation definition is updated by user"
+          type: string
+          format: 'date-time'
+          example: ???
+        endAt:
+          description: "Date time when simulation definition is expired"
+          type: string
+          format: date-time
+          example: string
+    SimulationDefinitionRequest:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+        startAt:
+          type: string
+          format: 'date-time'
+          example: ???
+        endAt:
+          type: string
+          format: 'date-time'
+          example: ???
+
