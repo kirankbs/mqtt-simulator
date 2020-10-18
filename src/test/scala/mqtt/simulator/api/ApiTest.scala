@@ -1,6 +1,8 @@
 package mqtt.simulator.api
 
-import java.time.ZonedDateTime
+import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder}
+import java.time.temporal.ChronoField
+import java.time.{LocalDateTime, ZoneOffset, ZonedDateTime}
 import java.util.UUID
 
 import akka.Done
@@ -22,17 +24,37 @@ class ApiTest extends AnyWordSpec with Matchers with IdiomaticMockito with Scala
   val mockRepo = mock[SimulationDefinitionRepo]
   val uuid = UUID.randomUUID()
   val now = ZonedDateTime.now()
+  val bbb: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
   val message = "foo"
   val routes = new API(mockRepo, () => uuid, () => now).routes
   val simulationDefReq = SimulationDefinitionRequest(message, None, None)
+  val sdf = SimulationDefinition(uuid, message, now, now, now)
+  val nowExpected = LocalDateTime.parse(now.format(bbb), bbb).atZone(ZoneOffset.UTC)
+  val sdfExpected = SimulationDefinition(uuid, message, nowExpected, nowExpected, nowExpected)
 
   "POST /simulation" should {
     "create simulation definition" in {
-      val sdf = SimulationDefinition(uuid, message, now, now, now)
       mockRepo.createSimulationDefinition(sdf) returns Future.successful(Done)
       Post("/simulation", simulationDefReq) ~> routes ~> check {
         println(response)
         status shouldBe Created
+      }
+    }
+  }
+  "Get /simulation" should {
+    "return empty result" in {
+      mockRepo.getSimulationDefinitions() returns Future.successful(Seq.empty)
+      Get("/simulation") ~> routes ~> check {
+        status shouldBe OK
+        responseAs[Seq[SimulationDefinition]] shouldBe Seq.empty
+      }
+    }
+    "return non empty result" in {
+      val result = Seq(sdfExpected, sdfExpected)
+      mockRepo.getSimulationDefinitions() returns Future.successful(result)
+      Get("/simulation") ~> routes ~> check {
+        status shouldBe OK
+        responseAs[Seq[SimulationDefinition]] shouldBe result
       }
     }
   }

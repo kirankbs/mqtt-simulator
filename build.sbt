@@ -7,7 +7,6 @@ scalaVersion := "2.13.2"
 val AkkaVersion = "2.6.8"
 val AkkaHttpVersion = "10.2.1"
 val SlickVersion = "3.3.3"
-
 val scalatestVersion = "3.2.0"
 
 libraryDependencies ++= Seq(
@@ -29,7 +28,6 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % scalatestVersion % "test",
   "com.typesafe.akka" %% "akka-http-testkit" % AkkaHttpVersion % Test,
   "com.typesafe.akka" %% "akka-testkit" % AkkaVersion % Test,
-  //"org.scalatest" %% "scalatest-shouldmatchers" % scalatestVersion % "test"
   "org.mockito" %% "mockito-scala" % "1.16.0"
 )
 
