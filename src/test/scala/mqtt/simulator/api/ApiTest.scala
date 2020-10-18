@@ -72,4 +72,12 @@ class ApiTest extends AnyWordSpec with Matchers with IdiomaticMockito with Scala
       }
     }
   }
+  "Patch /simulation/<id>" should {
+    "update simulation definition" in {
+      mockRepo.updateSimulationDefinition(uuid, simulationDefReq) returns Future.successful(Done)
+      Patch(s"/simulation/$uuid", simulationDefReq) ~> routes ~> check {
+        status shouldBe NoContent
+      }
+    }
+  }
 }
