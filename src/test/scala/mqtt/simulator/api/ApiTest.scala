@@ -9,6 +9,7 @@ import akka.Done
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import spray.json.DefaultJsonProtocol._
 import akka.http.scaladsl.model.StatusCodes.{Created, NoContent, OK}
+import akka.http.scaladsl.server.Directives.delete
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import mqtt.simulator.api.models.{SimulationDefinition, SimulationDefinitionRequest}
 import mqtt.simulator.storage.SimulationDefinitionRepo
@@ -76,6 +77,14 @@ class ApiTest extends AnyWordSpec with Matchers with IdiomaticMockito with Scala
     "update simulation definition" in {
       mockRepo.updateSimulationDefinition(uuid, simulationDefReq) returns Future.successful(Done)
       Patch(s"/simulation/$uuid", simulationDefReq) ~> routes ~> check {
+        status shouldBe NoContent
+      }
+    }
+  }
+  "Delete /simulation/<id>" should {
+    "delete simulation definition" in {
+      mockRepo.deleteSimulationDefinition(uuid) returns Future { Done }
+      Delete(s"/simulation/$uuid") ~> routes ~> check {
         status shouldBe NoContent
       }
     }
