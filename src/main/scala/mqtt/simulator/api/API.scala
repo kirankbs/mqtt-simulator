@@ -11,9 +11,9 @@ import mqtt.simulator.storage.SimulationDefinitionRepo
 import spray.json.DefaultJsonProtocol._
 import scala.concurrent.Future
 
-class API(simulationDefRepo: SimulationDefinitionRepo) {
+class API(simulationDefRepo: SimulationDefinitionRepo, uuidGen: () => UUID, dateTimeGen: () => ZonedDateTime) {
 
-  val route = {
+  val routes = {
     pathPrefix("simulation") {
       get {
         pathEnd {
@@ -54,13 +54,8 @@ class API(simulationDefRepo: SimulationDefinitionRepo) {
   }
 
   def createSimulationDefinition(sdfr: SimulationDefinitionRequest): Future[Done] = {
-    val sdf = SimulationDefinition(
-      UUID.randomUUID(),
-      sdfr.message,
-      ZonedDateTime.now(),
-      sdfr.startAt.getOrElse(ZonedDateTime.now()),
-      sdfr.endAt.getOrElse(ZonedDateTime.now())
-    )
+    val now = dateTimeGen()
+    val sdf = SimulationDefinition(uuidGen(), sdfr.message, now, sdfr.startAt.getOrElse(now), sdfr.endAt.getOrElse(now))
     simulationDefRepo.createSimulationDefinition(sdf)
   }
   def getSimulationDefinitions() = simulationDefRepo.getSimulationDefinitions()
