@@ -1,5 +1,8 @@
 package mqtt.simulator
 
+import java.time.ZonedDateTime
+import java.util.UUID
+
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
@@ -23,7 +26,8 @@ object Main extends App {
   FlywayMigration(config, "db")
 
   // HTTP API to interact with Simulation
-  val bindAndFuture = Http().newServerAt("localhost", 8080).bind(new API(new SimulationDefinitionRepo(db)).route)
+  val api = new API(new SimulationDefinitionRepo(db), UUID.randomUUID, ZonedDateTime.now)
+  val bindAndFuture = Http().newServerAt("localhost", 8080).bind(api.routes)
   println(s"Server online at http://localhost:8080/ ...")
   StdIn.readLine() //TODO Replace it
   bindAndFuture

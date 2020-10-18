@@ -8,6 +8,8 @@ val AkkaVersion = "2.6.8"
 val AkkaHttpVersion = "10.2.1"
 val SlickVersion = "3.3.3"
 
+val scalatestVersion = "3.2.0"
+
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,
   "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion,
@@ -18,6 +20,17 @@ libraryDependencies ++= Seq(
   "org.flywaydb" % "flyway-core" % "7.0.2",
   "org.postgresql" % "postgresql" % "9.4-1206-jdbc42",
   "com.github.tminglei" %% "slick-pg" % "0.19.3"
+)
+
+// Testing
+
+libraryDependencies ++= Seq(
+  "org.scalactic" %% "scalactic" % scalatestVersion,
+  "org.scalatest" %% "scalatest" % scalatestVersion % "test",
+  "com.typesafe.akka" %% "akka-http-testkit" % AkkaHttpVersion % Test,
+  "com.typesafe.akka" %% "akka-testkit" % AkkaVersion % Test,
+  //"org.scalatest" %% "scalatest-shouldmatchers" % scalatestVersion % "test"
+  "org.mockito" %% "mockito-scala" % "1.16.0"
 )
 
 scalafmtOnCompile := true
