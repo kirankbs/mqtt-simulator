@@ -88,6 +88,22 @@ paths:
                 $ref: '#/components/schemas/SimulationDefinition'
         204:
           description: Requested resource is not available
+    delete:
+      summary: Deletes simulation definition
+      description: The API delets simulation definition specified by user
+      tags:
+        - Simulation Definitions
+      parameters:
+        - in: path
+          name: id
+          description: UUID of the simulation definition to remove
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: Requested simulation definition is removed
 
 components:
   schemas:
@@ -139,4 +155,3 @@ components:
           type: string
           format: 'date-time'
           example: ???
-
